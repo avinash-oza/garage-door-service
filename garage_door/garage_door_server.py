@@ -1,7 +1,6 @@
 import time
 import datetime
 import json
-import configparser
 import requests
 
 from flask import Flask, request
@@ -10,12 +9,10 @@ import boto3
 #TODO: REMOVE THIS CODE
 import RPi.GPIO as GPIO
 # from garage_door.mock_gpio import GPIO
-config = configparser.ConfigParser()
-config.read('garage_door.config')
-
-hostname = config.get('general', 'hostname')
 
 app = Flask(__name__)
+
+app.config.from_envvar('APP_SETTINGS')
 api = Api(app)
 
 
@@ -113,7 +110,7 @@ def get_garage_dict_status(garage_name):
             # Nagios fields
             one_response['plugin_output'] = "Garage is {0}".format(garage_status)
             one_response['service_description'] = "{0} Garage Status".format(one_garage.capitalize())
-            one_response['hostname'] = hostname
+            one_response['hostname'] = app.config['GENERAL_HOSTNAME']
             one_response['return_code'] = "0" if garage_status == "CLOSED" else "2"
             one_response['status'] = 'OPEN' if garage_status == OPEN else 'CLOSED'
 
