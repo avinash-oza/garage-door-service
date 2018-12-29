@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from garage_door.garage_door_server import setup_pins, app
+from garage_door.app import app
+from garage_door.pi_funcs import setup_pins, cleanup_pins
 
 #TODO: Dict format in the future?
 import logging
@@ -12,4 +13,4 @@ if __name__ == '__main__':
         setup_pins()
         app.run(host='0.0.0.0', debug=True)
     finally:
-        GPIO.cleanup()
+        cleanup_pins()

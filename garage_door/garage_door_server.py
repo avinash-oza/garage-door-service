@@ -1,30 +1,13 @@
-import time
 import datetime
 import json
-import requests
 
-from flask import Flask, request
-from flask_restplus import Api, Resource, fields, marshal
 import boto3
-#TODO: REMOVE THIS CODE
-import RPi.GPIO as GPIO
-# from garage_door.mock_gpio import GPIO
+import requests
+from flask import request
+from flask_restplus import Resource, fields, marshal
 
-app = Flask(__name__)
+from garage_door.pi_funcs import trigger_garage, get_garage_status, SORTED_KEYS
 
-app.config.from_envvar('APP_SETTINGS')
-api = Api(app)
-
-
-# Pi specific constants relative to looking at the house
-RELAY_PIN_MAPPING = {'LEFT' : 27, 'RIGHT': 22} 
-GARAGE_SENSOR_MAPPING = {'LEFT': 25, 'RIGHT': 16}
-SORTED_KEYS = [k for k in sorted(RELAY_PIN_MAPPING)] # Sort keys so order is the same
-# 0 is CLOSED
-# 1 is OPEN
-#TODO: Make this an enum
-CLOSE = CLOSED = 0
-OPEN = 1
 
 def value_to_status(value):
     """
@@ -35,40 +18,8 @@ def value_to_status(value):
     return 'CLOSED' if value == 0 else 'OPEN'
 
 
-def setup_pins():
-    GPIO.setmode(GPIO.BCM)
-    for one_pin in RELAY_PIN_MAPPING.values():
-        GPIO.setup(one_pin, GPIO.OUT)
-
-    for one_pin in GARAGE_SENSOR_MAPPING.values():
-        GPIO.setup(one_pin, GPIO.IN)
-
-
-def get_garage_status(garage_name):
-    """
-    Gets the garage status specified. Throws an exception if an invalid name is passed
-    :param garage_name:
-    :return:
-    """
-    if garage_name not in GARAGE_SENSOR_MAPPING:
-        raise ValueError("Invalid garage name passed")
-
-    pin_result = GPIO.input(GARAGE_SENSOR_MAPPING[garage_name])
-    if pin_result in (OPEN, CLOSED):
-        return bool(pin_result)
-
-    raise ValueError("Pin value of {} is invalid".format(pin_result))
-
 def control_garage(garage_name, action):
     response = {'garage_name': garage_name, 'error': True}
-
-    if garage_name not in RELAY_PIN_MAPPING:
-        response['message'] = 'INVALID GARAGE_NAME'
-        return response
-
-    if action not in ('OPEN', 'CLOSE'):
-        response['message'] = 'INVALID ACTION'
-        return response
 
     # Check what the current location is
     current_garage_status = value_to_status(get_garage_status(garage_name))
@@ -78,11 +29,8 @@ def control_garage(garage_name, action):
     elif current_garage_status == 'CLOSED' and action == 'CLOSE':
         response['message'] = 'Trying to close garage that is already closed'
     else:
-        relay_pin = RELAY_PIN_MAPPING[garage_name]
         try:
-#           GPIO.output(relay_pin,GPIO.HIGH)
-            time.sleep(0.5)
-#           GPIO.output(relay_pin,GPIO.LOW)
+            trigger_garage(garage_name)
         except:
             response['message'] = 'AN ERROR OCCURED WHILE TRIGGERING THE RELAY'
         else:
@@ -129,7 +77,6 @@ GarageStatusModel = api.model('GarageStatusModel', {
     'error': fields.Boolean(),
     'message': fields.String(allow_null=True)
 })
-
 NagiosGarageStatusModel = api.inherit('NagiosGarageStatusModel', GarageStatusModel,
                                       {'return_code': fields.String(),
                                        'plugin_output': fields.String(),
@@ -137,14 +84,12 @@ NagiosGarageStatusModel = api.inherit('NagiosGarageStatusModel', GarageStatusMod
                                        'service_description': fields.String()
                                        }
                                       )
-
 GarageStatusResponseModel = api.model('GarageStatusResponseModel',
                                       {'status': fields.List(fields.Nested(GarageStatusModel)),
                                        'type': fields.String(default='STATUS'),
                                         'id': fields.String()
                                        }
                                       )
-
 
 @api.route('/garage/status')
 class GarageStatusResource(Resource):
