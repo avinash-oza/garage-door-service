@@ -9,7 +9,7 @@ from flask_restplus import Api, Resource, fields, marshal
 import boto3
 #TODO: REMOVE THIS CODE
 import RPi.GPIO as GPIO
-# from mock_gpio import GPIO
+# from garage_door.mock_gpio import GPIO
 config = configparser.ConfigParser()
 config.read('garage_door.config')
 
@@ -227,12 +227,3 @@ class SNSCallbackResource(Resource):
         print("TEST publishing {}".format(json.dumps(cleaned_response)))
 
         # self._queue.send_message(MessageBody=json.dumps(response))
-
-
-if __name__ == '__main__':
-    try:
-        setup_pins()
-        port_number = int(config.get('general', 'port'))
-        app.run(host='0.0.0.0', port=port_number)
-    finally:
-        GPIO.cleanup()

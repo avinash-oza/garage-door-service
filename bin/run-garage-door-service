@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+import configparser
+from garage_door.garage_door_server import setup_pins, app
+
+#TODO: Dict format in the future?
+import logging
+logging.basicConfig(format='%(asctime)s %(message)s')
+
+#TODO: Allow the bot config to be specified by the command line
+bot_config_path = '/etc/garage-door-service/config.config'
+config = configparser.ConfigParser()
+config.read(bot_config_path)
+
+if __name__ == '__main__':
+    try:
+        setup_pins()
+        port_number = int(config.get('general', 'port'))
+        app.run(host='0.0.0.0', port=port_number)
+    finally:
+        GPIO.cleanup()
