@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
         name='garage-door',
-        version='0.1',
+        version='0.2b1',
         packages=['garage_door',],
         scripts=['bin/run-garage-door-service'],
         license='TBD',
