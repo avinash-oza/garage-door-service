@@ -93,6 +93,7 @@ GarageStatusResponseModel = api.model('GarageStatusResponseModel',
 class GarageStatusResource(Resource):
     @api.marshal_with(GarageStatusResponseModel)
     def get(self, garage_name='ALL'):
+        app.logger.info("Test line")
         return {'status': get_garage_dict_status(garage_name), 'type': 'STATUS'}
 
 
@@ -129,19 +130,18 @@ class SNSCallbackResource(Resource):
         try:
             data = json.loads(request.data.decode('utf-8'))
         except Exception as e:
-            print(e)
-            print("exception parsing {}".format(request.data))
+            app.logger.exception("exception parsing {}".format(request.data))
         else:
             if data['Type'] == 'SubscriptionConfirmation' and 'SubscribeURL' in data:
                 # call the subscription url to confirm
-                print(data['SubscribeURL'])
+                app.logger.info("Subscribe URL is {}".format(data['SubscribeURL']))
                 requests.get(data['SubscribeURL'])
             elif data['Type'] == 'Notification':
                 # extract out the message and process
-                print("Message is {}".format(data))
+                app.logger.info("Message is {}".format(data))
                 self.process_sns_message(data)
             else:
-                print("Couldnt process message: {}".format(data))
+                app.logger.error("Couldnt process message: {}".format(data))
 
         return 'OK\n'
 
@@ -164,6 +164,6 @@ class SNSCallbackResource(Resource):
 
         # publish the message to the queue
         cleaned_response = marshal(response, GarageStatusResponseModel)
-        print("TEST publishing {}".format(json.dumps(cleaned_response)))
+        app.logger.info("TEST publishing {}".format(json.dumps(cleaned_response)))
 
         # self._queue.send_message(MessageBody=json.dumps(response))
