@@ -163,7 +163,7 @@ class SNSCallbackResource(Resource):
             response['status'] = [{'message': 'Invalid action passed', 'error': True}]
 
         # publish the message to the queue
-        cleaned_response = marshal(response, GarageStatusResponseModel)
-        app.logger.info("TEST publishing {}".format(json.dumps(cleaned_response)))
+        cleaned_response = json.dumps(marshal(response, GarageStatusResponseModel))
+        app.logger.info("Publishing response: {}".format(cleaned_response)
 
-        # self._queue.send_message(MessageBody=json.dumps(response))
+        self._queue.send_message(MessageBody=cleaned_response)
