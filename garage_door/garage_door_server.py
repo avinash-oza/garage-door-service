@@ -164,6 +164,6 @@ class SNSCallbackResource(Resource):
 
         # publish the message to the queue
         cleaned_response = json.dumps(marshal(response, GarageStatusResponseModel))
-        app.logger.info("Publishing response: {}".format(cleaned_response)
+        app.logger.info("Publishing response: {}".format(cleaned_response))
 
         self._queue.send_message(MessageBody=cleaned_response)
