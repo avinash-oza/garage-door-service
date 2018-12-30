@@ -1,7 +1,10 @@
 import time
 
-from garage_door.mock_gpio import GPIO
-# import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except ImportError:
+    print("IMPORTING MOCK GPIO!!!!")
+    from garage_door.mock_gpio import GPIO
 
 # Pi specific constants relative to looking at the house
 RELAY_PIN_MAPPING = {'LEFT' : 27, 'RIGHT': 22}
