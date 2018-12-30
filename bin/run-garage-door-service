@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from garage_door.app import app
+from garage_door.garage_door_server import app
 from garage_door.pi_funcs import setup_pins, cleanup_pins
 
 #TODO: Dict format in the future?

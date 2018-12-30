@@ -3,19 +3,17 @@ import json
 
 import boto3
 import requests
+from flask import Flask
 from flask import request
+from flask_restplus import Api
 from flask_restplus import Resource, fields, marshal
 
-from garage_door.pi_funcs import trigger_garage, get_garage_status, SORTED_KEYS
+from garage_door.pi_funcs import trigger_garage, get_garage_status, SORTED_KEYS, value_to_status
 
+app = Flask(__name__)
 
-def value_to_status(value):
-    """
-    returns the position given a number
-    :param value:
-    :return:
-    """
-    return 'CLOSED' if value == 0 else 'OPEN'
+app.config.from_envvar('APP_SETTINGS')
+api = Api(app)
 
 
 def control_garage(garage_name, action):
@@ -60,7 +58,7 @@ def get_garage_dict_status(garage_name):
             one_response['service_description'] = "{0} Garage Status".format(one_garage.capitalize())
             one_response['hostname'] = app.config['GENERAL_HOSTNAME']
             one_response['return_code'] = "0" if garage_status == "CLOSED" else "2"
-            one_response['status'] = 'OPEN' if garage_status == OPEN else 'CLOSED'
+            one_response['status'] = value_to_status(garage_status)
 
         one_response['garage_name'] = one_garage
         one_response['status_time'] = datetime.datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')

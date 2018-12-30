@@ -1,6 +1,7 @@
 import time
 
-from garage_door.mock_gpio import GPIO
+# from garage_door.mock_gpio import GPIO
+import RPi.GPIO as GPIO
 
 # Pi specific constants relative to looking at the house
 RELAY_PIN_MAPPING = {'LEFT' : 27, 'RIGHT': 22}
@@ -46,3 +47,11 @@ def get_garage_status(garage_name):
         return bool(pin_result)
 
     raise ValueError("Pin value of {} is invalid".format(pin_result))
+
+def value_to_status(value):
+    """
+    returns the position given a number
+    :param value:
+    :return:
+    """
+    return 'CLOSED' if value == 0 else 'OPEN'
