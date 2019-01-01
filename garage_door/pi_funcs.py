@@ -27,9 +27,9 @@ def cleanup_pins():
 
 def trigger_garage(garage_name):
     relay_pin = RELAY_PIN_MAPPING[garage_name]
-    # GPIO.output(relay_pin,GPIO.HIGH)
+    GPIO.output(relay_pin,GPIO.HIGH)
     time.sleep(0.5)
-    # GPIO.output(relay_pin,GPIO.LOW)
+    GPIO.output(relay_pin,GPIO.LOW)
 
 
 def get_garage_status(garage_name):
