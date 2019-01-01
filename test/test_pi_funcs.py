@@ -28,3 +28,11 @@ class PiFuncsTestCase(TestCase):
 
         with self.assertRaises(ValueError):
             get_garage_status('ABC')
+        self.assertFalse(mock_gpio.input.called)
+
+    def test_invalid_value(self, mock_gpio):
+        mock_gpio.input.side_effect = lambda pin: {25: 0.5 }[pin]
+
+        with self.assertRaises(ValueError):
+            get_garage_status('LEFT')
+        mock_gpio.input.assert_called_with(25)
