@@ -8,4 +8,4 @@ python:
 install:
     - pip install -r requirements.txt
 
-script: python -m unittest discover --verbose
+script: python -m unittest discover -s test/ -t test/ --verbose
