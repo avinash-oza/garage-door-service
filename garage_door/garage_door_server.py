@@ -3,17 +3,11 @@ import json
 
 import boto3
 import requests
-from flask import Flask
 from flask import request
-from flask_restplus import Api
 from flask_restplus import Resource, fields, marshal
 
-from garage_door.pi_funcs import trigger_garage, get_garage_status, SORTED_KEYS, value_to_status
-
-app = Flask(__name__)
-
-app.config.from_envvar('APP_SETTINGS')
-api = Api(app)
+from . import app, api
+from .pi_funcs import trigger_garage, get_garage_status, SORTED_KEYS, value_to_status
 
 
 def control_garage(garage_name, action):
