@@ -3,7 +3,7 @@ import time
 from RPi import GPIO
 
 # Pi specific constants relative to looking at the house
-RELAY_PIN_MAPPING = {'LEFT' : 27, 'RIGHT': 22}
+RELAY_PIN_MAPPING = {'LEFT' : 27, 'RIGHT': 17}
 GARAGE_SENSOR_MAPPING = {'LEFT': 25, 'RIGHT': 16}
 SORTED_KEYS = [k for k in sorted(RELAY_PIN_MAPPING)] # Sort keys so order is the same
 
@@ -22,14 +22,16 @@ def setup_pins():
     for one_pin in GARAGE_SENSOR_MAPPING.values():
         GPIO.setup(one_pin, GPIO.IN)
 
+
 def cleanup_pins():
     GPIO.cleanup()
 
+
 def trigger_garage(garage_name):
     relay_pin = RELAY_PIN_MAPPING[garage_name]
-    GPIO.output(relay_pin,GPIO.HIGH)
+    GPIO.output(relay_pin, GPIO.HIGH)
     time.sleep(0.5)
-    GPIO.output(relay_pin,GPIO.LOW)
+    GPIO.output(relay_pin, GPIO.LOW)
 
 
 def get_garage_status(garage_name):
