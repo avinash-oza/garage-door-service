@@ -34,6 +34,7 @@ if __name__ == '__main__':
     parser.add_argument('--api-endpoint', type=str, help="Garage status API endpoint")
     parser.add_argument('--token', type=str, help="Nagios passive check token")
     parser.add_argument('--submit-check-url', type=str, help="Nagios passive check url")
+    parser.add_argument('--shostname', type=str, help="Nagios passive check url")
     args = parser.parse_args()
 
-    submit_check(args.api_endpoint, args.submit_check_url, args.token)
+    submit_check(args.api_endpoint, args.submit_check_url, args.token, args.hostname)
