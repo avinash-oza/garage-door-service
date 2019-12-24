@@ -7,18 +7,21 @@ from flask import request
 from flask_restplus import Resource, fields, marshal
 
 from . import app, api
-from .pi_funcs import trigger_garage, get_garage_status, SORTED_KEYS, value_to_status
+from .pi_funcs import trigger_garage, get_garage_status, SORTED_KEYS
 
 
 def control_garage(garage_name, action):
     response = {'garage_name': garage_name, 'error': True}
 
     # Check what the current location is
-    current_garage_status = value_to_status(get_garage_status(garage_name))
+    garage_status = get_garage_status(garage_name)
+
+    current_garage_status = str(garage_status)
+
     response['status'] = current_garage_status
-    if current_garage_status == 'OPEN' and action == 'OPEN':
+    if garage_status.is_open and action == 'OPEN':
         response['message'] = 'Trying to open garage that is already open'
-    elif current_garage_status == 'CLOSED' and action == 'CLOSE':
+    elif not garage_status.is_open and action == 'CLOSE':
         response['message'] = 'Trying to close garage that is already closed'
     else:
         try:
@@ -49,12 +52,12 @@ def get_garage_dict_status(garage_name):
         else:
             # Nagios fields
             one_response['plugin_output'] = "Garage is {0}".format(garage_status)
-            one_response['service_description'] = "{0} Garage Status".format(one_garage.capitalize())
+            one_response['service_description'] = "{0} Garage Status".format(garage_status.name)
             one_response['hostname'] = app.config['GENERAL_HOSTNAME']
-            one_response['return_code'] = "0" if garage_status == "CLOSED" else "2"
-            one_response['status'] = value_to_status(garage_status)
+            one_response['return_code'] = "0" if not garage_status.is_open else "2"
+            one_response['status'] = garage_status
 
-        one_response['garage_name'] = one_garage
+        one_response['garage_name'] = garage_status.name
         one_response['status_time'] = datetime.datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')
 
         response.append(one_response)

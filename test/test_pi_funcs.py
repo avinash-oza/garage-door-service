@@ -20,12 +20,12 @@ class PiFuncsTestCase(TestCase):
     def test_check_right_garage_open(self, mock_gpio):
         mock_gpio.input.side_effect = self.garage_sensor_status
 
-        self.assertEqual(get_garage_status('RIGHT'), 1)
+        self.assertEqual(get_garage_status('RIGHT').is_open, True)
 
     def test_check_left_garage_closed(self, mock_gpio):
         mock_gpio.input.side_effect = self.garage_sensor_status
 
-        self.assertEqual(get_garage_status('LEFT'), 0)
+        self.assertEqual(get_garage_status('LEFT').is_open, False)
 
     def test_invalid_garage(self, mock_gpio):
         mock_gpio.input.side_effect = self.garage_sensor_status
