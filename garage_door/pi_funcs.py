@@ -68,4 +68,4 @@ def get_garage_status(garage_name):
         raise ValueError("Invalid garage name passed")
 
     pin_result = GPIO.input(GARAGE_SENSOR_MAPPING[garage_name])
-    return GarageStatus(garage_name, bool(pin_result))
+    return GarageStatus(garage_name, pin_result)
