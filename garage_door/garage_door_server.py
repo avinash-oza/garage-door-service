@@ -51,11 +51,12 @@ def get_garage_dict_status(garage_name):
             one_response['status'] = str(e)
         else:
             # Nagios fields
-            one_response['plugin_output'] = "Garage is {0}".format(garage_status)
-            one_response['service_description'] = "{0} Garage Status".format(garage_status.name)
-            one_response['hostname'] = app.config['GENERAL_HOSTNAME']
-            one_response['return_code'] = "0" if not garage_status.is_open else "2"
+            # one_response['plugin_output'] = "Garage is {0}".format(garage_status)
+            # one_response['service_description'] = "{0} Garage Status".format(garage_status.name)
+            # one_response['hostname'] = app.config['GENERAL_HOSTNAME']
+            # one_response['return_code'] = "0" if not garage_status.is_open else "2"
             one_response['status'] = garage_status
+            one_response['is_open'] = garage_status.is_open
 
         one_response['garage_name'] = garage_status.name
         one_response['status_time'] = datetime.datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')
@@ -70,15 +71,10 @@ GarageStatusModel = api.model('GarageStatusModel', {
     'garage_name': fields.String(),
     'status': fields.String(),
     'error': fields.Boolean(),
+    'is_open': fields.Boolean(default=True),
     'message': fields.String(allow_null=True)
 })
-NagiosGarageStatusModel = api.inherit('NagiosGarageStatusModel', GarageStatusModel,
-                                      {'return_code': fields.String(),
-                                       'plugin_output': fields.String(),
-                                       'status_time': fields.String(),
-                                       'service_description': fields.String()
-                                       }
-                                      )
+
 GarageStatusResponseModel = api.model('GarageStatusResponseModel',
                                       {'status': fields.List(fields.Nested(GarageStatusModel)),
                                        'type': fields.String(default='STATUS'),
