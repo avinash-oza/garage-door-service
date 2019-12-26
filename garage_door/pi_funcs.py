@@ -33,7 +33,7 @@ class GarageStatus:
 
     @property
     def name(self):
-        return self._name.capitalize()
+        return self._name.upper()
 
     def __repr__(self):
         return "OPEN" if self.is_open else "CLOSED"
