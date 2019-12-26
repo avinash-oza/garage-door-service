@@ -50,11 +50,6 @@ def get_garage_dict_status(garage_name):
             one_response['error'] = True
             one_response['status'] = str(e)
         else:
-            # Nagios fields
-            # one_response['plugin_output'] = "Garage is {0}".format(garage_status)
-            # one_response['service_description'] = "{0} Garage Status".format(garage_status.name)
-            # one_response['hostname'] = app.config['GENERAL_HOSTNAME']
-            # one_response['return_code'] = "0" if not garage_status.is_open else "2"
             one_response['status'] = garage_status
             one_response['is_open'] = garage_status.is_open
 
@@ -86,7 +81,6 @@ GarageStatusResponseModel = api.model('GarageStatusResponseModel',
 class GarageStatusResource(Resource):
     @api.marshal_with(GarageStatusResponseModel)
     def get(self, garage_name='ALL'):
-        app.logger.info("Test line")
         return {'status': get_garage_dict_status(garage_name), 'type': 'STATUS'}
 
 
