@@ -105,6 +105,26 @@ SNSMessageModel = api.model('SNSMessageModel', {
 })
 
 
+@api.route('/garage/trigger')
+class GarageTriggerResource(Resource):
+    def post(self):
+
+        # TODO: switch to request.json
+        response = {'type': 'STATUS'}
+        raw_input_message = json.loads(data['Message'])  # the message as it was sent in
+        message_type = raw_input_message['type']
+        garage_name = raw_input_message['garage_name']
+
+        if message_type == 'STATUS':
+            response['status'] = get_garage_dict_status(garage_name)
+        elif message_type == 'CONTROL':
+            response['status'] = [control_garage(garage_name, raw_input_message['action'])]
+        else:
+            response['status'] = [{'message': 'Invalid action passed', 'error': True}]
+
+        return response
+
+
 @api.route('/sns-callback')
 class SNSCallbackResource(Resource):
     def __init__(self, api=None, *args, **kwargs):
