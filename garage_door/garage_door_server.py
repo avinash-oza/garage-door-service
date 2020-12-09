@@ -50,11 +50,11 @@ def get_garage_dict_status(garage_name):
             one_response['error'] = True
             one_response['status'] = str(e)
         else:
-            one_response['status'] = garage_status
+            one_response['status'] = str(garage_status)
             one_response['is_open'] = garage_status.is_open
 
-        one_response['garage_name'] = garage_status.name
-        one_response['status_time'] = datetime.datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')
+            one_response['garage_name'] = garage_status.name
+            one_response['status_time'] = datetime.datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')
 
         response.append(one_response)
 
@@ -105,20 +105,18 @@ SNSMessageModel = api.model('SNSMessageModel', {
 })
 
 
-@api.route('/garage/trigger')
+@api.route('/garage/trigger/<string:garage_name>')
 class GarageTriggerResource(Resource):
-    def post(self):
-
-        # TODO: switch to request.json
+    def post(self, garage_name):
         response = {'type': 'STATUS'}
-        raw_input_message = json.loads(data['Message'])  # the message as it was sent in
-        message_type = raw_input_message['type']
-        garage_name = raw_input_message['garage_name']
+        raw_input_message = request.json  # the message as it was sent in
 
-        if message_type == 'STATUS':
-            response['status'] = get_garage_dict_status(garage_name)
-        elif message_type == 'CONTROL':
-            response['status'] = [control_garage(garage_name, raw_input_message['action'])]
+        message_type = raw_input_message['type']
+        garage_name = garage_name.upper()
+        action = raw_input_message['action']
+
+        if message_type == 'CONTROL':
+            response['status'] = [control_garage(garage_name, action)]
         else:
             response['status'] = [{'message': 'Invalid action passed', 'error': True}]
 
